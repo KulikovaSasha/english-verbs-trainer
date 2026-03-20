@@ -1,0 +1,23 @@
+[
+  {
+    "base_form": "go",
+    "past_simple": "went",
+    "past_participle": "gone",
+    "translation": "идти",
+    "level": "A0"
+  },
+  {
+    "base_form": "see",
+    "past_simple": "saw",
+    "past_participle": "seen",
+    "translation": "видеть",
+    "level": "A0"
+  },
+  {
+    "base_form": "come",
+    "past_simple": "came",
+    "past_participle": "come",
+    "translation": "приходить",
+    "level": "A0"
+  }
+]
