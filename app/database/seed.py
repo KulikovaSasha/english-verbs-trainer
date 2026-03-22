@@ -5,6 +5,7 @@ from app.database.db import SessionLocal
 from app.database.models import IrregularVerb
 
 
+
 def load_verbs():
     db = SessionLocal()
 
