@@ -10,6 +10,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     telegram_id = Column(String, unique=True, nullable=True)
     username = Column(String, nullable=True)
+    score = Column(Integer, default=0)
 
     results = relationship("TrainingResult", back_populates="user")
     progress = relationship("UserProgress", back_populates="user")

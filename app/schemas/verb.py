@@ -32,6 +32,8 @@ class TrainingCheckResponse(BaseModel):
     correct_past_simple: str
     correct_past_participle: str
     message: str
+    points_earned: int
+    total_score: int
 
 class HardVerbResponse(BaseModel):
     base_form: str
@@ -46,3 +48,9 @@ class UserStatsResponse(BaseModel):
     wrong_answers: int
     accuracy: float
     hard_verbs: list[HardVerbResponse]
+
+class LevelProgressResponse(BaseModel):
+    level: str
+    total_verbs: int
+    learned_verbs: int
+    progress_percent: float

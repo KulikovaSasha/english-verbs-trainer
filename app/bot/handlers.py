@@ -6,6 +6,7 @@ from app.database.db import SessionLocal
 from app.services.trainer import check_training_answer, get_training_task
 
 from app.services.stats import get_user_stats
+from app.services.progress import get_user_level_progress
 
 active_tasks = {}
 
@@ -17,6 +18,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/start - start the bot\n"
         "/help - show help\n"
         "/train - start training"
+        "/score - show your score"
+        "/progress - show level progress"
     )
 
 
@@ -28,6 +31,8 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/train - get a training task\n\n"
         "Answer format:\n"
         "went, gone"
+        "/score - show your score"
+        "/progress - show level progress"
     )
 
 
@@ -62,6 +67,48 @@ async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await update.message.reply_text(message)
 
+    finally:
+        db.close()
+
+async def score_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    telegram_user = update.effective_user
+    db = SessionLocal()
+
+    try:
+        user = get_or_create_user(
+            db=db,
+            telegram_id=str(telegram_user.id),
+            username=telegram_user.username,
+        )
+
+        await update.message.reply_text(
+            f"🏆 Your score: {user.score}"
+        )
+    finally:
+        db.close()
+
+async def progress_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    telegram_user = update.effective_user
+    db = SessionLocal()
+
+    try:
+        user = get_or_create_user(
+            db=db,
+            telegram_id=str(telegram_user.id),
+            username=telegram_user.username,
+        )
+
+        level = "A0"
+        if context.args:
+            level = context.args[0].upper()
+
+        progress = get_user_level_progress(db, user.id, level)
+
+        await update.message.reply_text(
+            f"📘 Progress for level {progress['level']}\n\n"
+            f"Learned verbs: {progress['learned_verbs']} / {progress['total_verbs']}\n"
+            f"Progress: {progress['progress_percent']}%"
+        )
     finally:
         db.close()
 
@@ -158,3 +205,5 @@ def register_handlers(application):
         MessageHandler(filters.TEXT & ~filters.COMMAND, handle_answer)
     )
     application.add_handler(CommandHandler("stats", stats_command))
+    application.add_handler(CommandHandler("score", score_command))
+    application.add_handler(CommandHandler("progress", progress_command))

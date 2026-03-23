@@ -57,3 +57,32 @@ def get_hard_verbs(db: Session, user_id: int, limit: int = 5):
     )
 
     return results
+
+def get_level_progress(db: Session, user_id: int, level: str):
+    total_verbs = (
+        db.query(IrregularVerb)
+        .filter(IrregularVerb.level == level)
+        .count()
+    )
+
+    learned_verbs = (
+        db.query(UserProgress)
+        .join(IrregularVerb, UserProgress.verb_id == IrregularVerb.id)
+        .filter(
+            UserProgress.user_id == user_id,
+            IrregularVerb.level == level,
+            UserProgress.correct_count > 0,
+        )
+        .count()
+    )
+
+    progress_percent = 0.0
+    if total_verbs:
+        progress_percent = round((learned_verbs / total_verbs) * 100, 2)
+
+    return {
+        "level": level,
+        "total_verbs": total_verbs,
+        "learned_verbs": learned_verbs,
+        "progress_percent": progress_percent,
+    }

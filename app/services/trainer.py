@@ -1,10 +1,14 @@
 from sqlalchemy.orm import Session
 
-from app.database.models import IrregularVerb, TrainingResult, UserProgress
+from app.crud.verb import get_random_verb, get_random_verb_by_level
+from app.database.models import IrregularVerb, TrainingResult, User, UserProgress
 
 
-def get_training_task(db: Session):
-    verb = db.query(IrregularVerb).order_by(IrregularVerb.id).first()
+def get_training_task(db: Session, level: str | None = None):
+    if level:
+        verb = get_random_verb_by_level(db, level)
+    else:
+        verb = get_random_verb(db)
 
     if verb is None:
         return None
@@ -24,8 +28,11 @@ def check_training_answer(
     past_simple: str,
     past_participle: str,
 ):
-    verb = db.query(IrregularVerb).filter(IrregularVerb.id == verb_id).first()
+    user = db.query(User).filter(User.id == user_id).first()
+    if user is None:
+        return None
 
+    verb = db.query(IrregularVerb).filter(IrregularVerb.id == verb_id).first()
     if verb is None:
         return None
 
@@ -67,8 +74,12 @@ def check_training_answer(
         )
         db.add(progress)
 
+    points_earned = 0
+
     if is_correct:
         progress.correct_count += 1
+        user.score += 10
+        points_earned = 10
         message = "Correct!"
     else:
         progress.wrong_count += 1
@@ -81,4 +92,7 @@ def check_training_answer(
         "correct_past_simple": verb.past_simple,
         "correct_past_participle": verb.past_participle,
         "message": message,
+        "points_earned": points_earned,
+        "total_score": user.score,
     }
+

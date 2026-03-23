@@ -14,6 +14,9 @@ from app.services.trainer import check_training_answer, get_training_task
 from app.schemas.verb import UserStatsResponse
 from app.services.stats import get_user_stats
 
+from app.schemas.verb import LevelProgressResponse
+from app.services.progress import get_user_level_progress
+
 router = APIRouter()
 
 
@@ -38,11 +41,11 @@ def read_verb(verb_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/train/task", response_model=TrainingTaskResponse)
-def read_training_task(db: Session = Depends(get_db)):
-    task = get_training_task(db)
+def read_training_task(level: str | None = None, db: Session = Depends(get_db)):
+    task = get_training_task(db, level=level)
 
     if task is None:
-        raise HTTPException(status_code=404, detail="No verbs available")
+        raise HTTPException(status_code=404, detail="No verbs available for this level")
 
     return task
 
@@ -65,3 +68,7 @@ def check_answer(data: TrainingAnswerRequest, db: Session = Depends(get_db)):
 @router.get("/stats/{user_id}", response_model=UserStatsResponse)
 def read_user_stats(user_id: int, db: Session = Depends(get_db)):
     return get_user_stats(db, user_id)
+
+@router.get("/progress/{user_id}/{level}", response_model=LevelProgressResponse)
+def read_level_progress(user_id: int, level: str, db: Session = Depends(get_db)):
+    return get_user_level_progress(db, user_id, level)
