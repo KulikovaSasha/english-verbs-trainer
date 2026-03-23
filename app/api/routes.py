@@ -11,6 +11,9 @@ from app.schemas.verb import (
 )
 from app.services.trainer import check_training_answer, get_training_task
 
+from app.schemas.verb import UserStatsResponse
+from app.services.stats import get_user_stats
+
 router = APIRouter()
 
 
@@ -58,3 +61,7 @@ def check_answer(data: TrainingAnswerRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Verb not found")
 
     return result
+
+@router.get("/stats/{user_id}", response_model=UserStatsResponse)
+def read_user_stats(user_id: int, db: Session = Depends(get_db)):
+    return get_user_stats(db, user_id)

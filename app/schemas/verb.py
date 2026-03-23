@@ -32,3 +32,17 @@ class TrainingCheckResponse(BaseModel):
     correct_past_simple: str
     correct_past_participle: str
     message: str
+
+class HardVerbResponse(BaseModel):
+    base_form: str
+    translation: str
+    correct_count: int
+    wrong_count: int
+
+
+class UserStatsResponse(BaseModel):
+    total_answers: int
+    correct_answers: int
+    wrong_answers: int
+    accuracy: float
+    hard_verbs: list[HardVerbResponse]

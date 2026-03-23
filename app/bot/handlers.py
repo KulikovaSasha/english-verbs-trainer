@@ -5,6 +5,8 @@ from app.crud.user import get_or_create_user
 from app.database.db import SessionLocal
 from app.services.trainer import check_training_answer, get_training_task
 
+from app.services.stats import get_user_stats
+
 active_tasks = {}
 
 
@@ -27,6 +29,41 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Answer format:\n"
         "went, gone"
     )
+
+
+async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    telegram_user = update.effective_user
+    db = SessionLocal()
+
+    try:
+        user = get_or_create_user(
+            db=db,
+            telegram_id=str(telegram_user.id),
+            username=telegram_user.username,
+        )
+
+        stats = get_user_stats(db, user.id)
+
+        message = (
+            f"📊 Your statistics\n\n"
+            f"Total answers: {stats['total_answers']}\n"
+            f"Correct answers: {stats['correct_answers']}\n"
+            f"Wrong answers: {stats['wrong_answers']}\n"
+            f"Accuracy: {stats['accuracy']}%\n"
+        )
+
+        if stats["hard_verbs"]:
+            message += "\nHard verbs:\n"
+            for verb in stats["hard_verbs"]:
+                message += (
+                    f"- {verb['base_form']} ({verb['translation']}) — "
+                    f"correct: {verb['correct_count']}, wrong: {verb['wrong_count']}\n"
+                )
+
+        await update.message.reply_text(message)
+
+    finally:
+        db.close()
 
 
 async def train_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -120,3 +157,4 @@ def register_handlers(application):
     application.add_handler(
         MessageHandler(filters.TEXT & ~filters.COMMAND, handle_answer)
     )
+    application.add_handler(CommandHandler("stats", stats_command))
