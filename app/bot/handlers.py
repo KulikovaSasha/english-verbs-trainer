@@ -17,9 +17,10 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Commands:\n"
         "/start - start the bot\n"
         "/help - show help\n"
-        "/train - start training"
-        "/score - show your score"
-        "/progress - show level progress"
+        "/train - start training\n"
+        "/stats - show your statistics\n"
+        "/score - show your score\n"
+        "/progress - show your level progress"
     )
 
 
@@ -28,11 +29,12 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Use these commands:\n"
         "/start - start the bot\n"
         "/help - show help\n"
-        "/train - get a training task\n\n"
+        "/train - get a training task\n"
+        "/stats - show your statistics\n"
+        "/score - show your score\n"
+        "/progress - show your level progress\n\n"
         "Answer format:\n"
         "went, gone"
-        "/score - show your score"
-        "/progress - show level progress"
     )
 
 

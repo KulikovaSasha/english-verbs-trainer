@@ -4,6 +4,18 @@ from app.crud.verb import get_random_verb, get_random_verb_by_level
 from app.database.models import IrregularVerb, TrainingResult, User, UserProgress
 
 
+def normalize_text(text: str) -> str:
+    return text.strip().lower()
+
+
+def parse_answer_variants(value: str) -> set[str]:
+    return {
+        normalize_text(part)
+        for part in value.split("/")
+        if normalize_text(part)
+    }
+
+
 def get_training_task(db: Session, level: str | None = None):
     if level:
         verb = get_random_verb_by_level(db, level)
@@ -36,15 +48,15 @@ def check_training_answer(
     if verb is None:
         return None
 
-    normalized_past_simple = past_simple.strip().lower()
-    normalized_past_participle = past_participle.strip().lower()
+    normalized_past_simple = normalize_text(past_simple)
+    normalized_past_participle = normalize_text(past_participle)
 
-    correct_past_simple = verb.past_simple.strip().lower()
-    correct_past_participle = verb.past_participle.strip().lower()
+    valid_past_simple_answers = parse_answer_variants(verb.past_simple)
+    valid_past_participle_answers = parse_answer_variants(verb.past_participle)
 
     is_correct = (
-        normalized_past_simple == correct_past_simple
-        and normalized_past_participle == correct_past_participle
+        normalized_past_simple in valid_past_simple_answers
+        and normalized_past_participle in valid_past_participle_answers
     )
 
     result = TrainingResult(
@@ -95,4 +107,3 @@ def check_training_answer(
         "points_earned": points_earned,
         "total_score": user.score,
     }
-
