@@ -1,112 +1,63 @@
 # English Verbs Trainer
 
-Backend service for learning English irregular verbs with support for Telegram bot and future mobile application.
+A backend-powered application for learning English irregular verbs.
+
+The project includes:
+
+* FastAPI backend
+* Telegram bot as the first client
+* SQLite database
+* User progress tracking
+* Scoring system
+* Level-based training
 
 ---
 
-## 🚀 Project Overview
+## 🚀 Features
 
-This project is a backend platform for practicing English irregular verbs.
-
-It provides:
-
-* training sessions with verbs
-* answer validation
-* user progress tracking
-* statistics and performance analysis
-
-The system is designed with scalability in mind:
-
-* Telegram bot (first client)
-* REST API (core backend)
-* Mobile application (future client)
+* Learn irregular verbs through training sessions
+* Random verb selection
+* Level-based training (A0, A1, etc.)
+* Track user progress
+* Score system (points for correct answers)
+* Statistics and analytics
+* Telegram bot interface
 
 ---
 
-## 🏗️ Architecture
-
-```
-Mobile App (future)
-        |
-        | HTTP API
-        |
-Telegram Bot
-        |
-     FastAPI
-        |
-    Database
-```
-
----
-
-## 📂 Project Structure
+## 🏗 Project Structure
 
 ```
 english-verbs-trainer/
 │
 ├── app/
-│   ├── main.py              # FastAPI entry point
-│   │
-│   ├── core/               # Configuration
-│   │   └── config.py
-│   │
-│   ├── database/           # Database layer
-│   │   ├── db.py
-│   │   ├── models.py
-│   │   └── seed.py
-│   │
-│   ├── schemas/            # Pydantic schemas
-│   │   └── verb.py
-│   │
-│   ├── crud/               # Database operations
-│   │   ├── user.py
-│   │   ├── verb.py
-│   │   └── progress.py
-│   │
-│   ├── services/           # Business logic
-│   │   └── trainer.py
-│   │
-│   ├── api/                # API routes
-│   │   └── routes.py
-│   │
-│   └── bot/                # Telegram bot
-│       ├── telegram_bot.py
-│       └── handlers.py
+│   ├── main.py
+│   ├── core/
+│   ├── database/
+│   ├── schemas/
+│   ├── crud/
+│   ├── services/
+│   ├── api/
+│   └── bot/
 │
 ├── data/
 │   └── irregular_verbs.json
 │
-├── .env
-├── .gitignore
+├── .env.example
 ├── requirements.txt
-├── README.md
-└── .python-version
+└── README.md
 ```
 
 ---
 
-## ⚙️ Tech Stack
-
-* Python 3.11
-* FastAPI
-* SQLAlchemy
-* SQLite (for development)
-* python-dotenv
-* python-telegram-bot (planned)
-* httpx
-
----
-
-## 🔧 Installation
+## ⚙️ Setup
 
 ### 1. Clone repository
 
 ```
-git clone https://github.com/KulikovaSasha/english-verbs-trainer.git
+git clone https://github.com/YOUR_USERNAME/english-verbs-trainer.git
 cd english-verbs-trainer
 ```
-
----
 
 ### 2. Create virtual environment
 
@@ -116,13 +67,13 @@ python -m venv .venv
 
 Activate it:
 
-**Windows:**
+Windows:
 
 ```
 .venv\Scripts\activate
 ```
 
-**Mac/Linux:**
+Mac/Linux:
 
 ```
 source .venv/bin/activate
@@ -138,40 +89,45 @@ pip install -r requirements.txt
 
 ---
 
-### 4. Configure environment variables
+### 4. Create `.env` file
 
-Create `.env` file:
+Copy `.env.example`:
 
 ```
-TELEGRAM_TOKEN=
-DATABASE_URL=sqlite:///./verbs.db
+cp .env.example .env
+```
+
+Fill in your Telegram bot token:
+
+```
+TELEGRAM_TOKEN=your_token_here
+```
+
+---
+
+### 5. Initialize database
+
+```
+uvicorn app.main:app --reload
+```
+
+Then in another terminal:
+
+```
+python -m app.database.seed
 ```
 
 ---
 
 ## ▶️ Run the project
 
+### Run API
+
 ```
 uvicorn app.main:app --reload
 ```
 
----
-
-## 🌐 API Endpoints
-
-* Root:
-
-```
-GET /
-```
-
-Response:
-
-```
-{"message": "English Verbs Trainer API is running"}
-```
-
-* Swagger UI:
+API docs:
 
 ```
 http://127.0.0.1:8000/docs
@@ -179,82 +135,72 @@ http://127.0.0.1:8000/docs
 
 ---
 
-## 🗄️ Database
-
-SQLite database is used for development.
-
-The database file:
+### Run Telegram bot
 
 ```
-verbs.db
+python -m app.bot.telegram_bot
 ```
 
-Tables:
+---
 
-* users
-* irregular_verbs
-* training_results
-* user_progress
+## 🤖 Telegram Bot Commands
+
+* `/start` — start the bot
+* `/help` — show help
+* `/train` — get a training task
+* `/stats` — show statistics
+* `/score` — show score
+* `/progress` — show level progress
 
 ---
 
-## 📊 Features (planned)
+## 📊 API Endpoints
 
-* Training sessions
-* Answer validation
-* User statistics
-* Difficulty tracking
-* Levels (A0, A1, A2...)
-* Streak system
-* Telegram bot interface
-* Mobile app integration
-
----
-
-## 🧠 Development Plan
-
-### Day 1
-
-* Project setup
-* FastAPI
-* Database models
-
-### Day 2
-
-* Load verbs from JSON
-* CRUD operations
-* Basic API
-
-### Day 3+
-
-* Training logic
-* Telegram bot
-* Statistics
-* Game mechanics
+* `GET /verbs` — list all verbs
+* `GET /verbs/{id}` — get verb by ID
+* `GET /verbs/by-level/{level}` — verbs by level
+* `GET /train/task` — get training task
+* `GET /train/task?level=A0` — task by level
+* `POST /train/check` — check answer
+* `GET /stats/{user_id}` — user statistics
+* `GET /progress/{user_id}/{level}` — level progress
 
 ---
 
-## 🔐 Environment Variables
+## 🧠 Architecture
 
-| Variable       | Description                |
-| -------------- | -------------------------- |
-| TELEGRAM_TOKEN | Telegram bot token         |
-| DATABASE_URL   | Database connection string |
+The project is designed as a scalable backend system:
+
+* **FastAPI** — API layer
+* **Services** — business logic
+* **CRUD** — database operations
+* **Telegram bot** — client interface
+* **SQLite** — database
+
+Future extensions:
+
+* mobile application (Flutter / React Native)
+* authentication (JWT)
+* spaced repetition system
+* gamification features
 
 ---
 
-## 🧩 Future Improvements
+## 💡 Project Goal
 
-* PostgreSQL support
-* Authentication (JWT)
-* Docker support
-* CI/CD pipeline
-* Mobile app (Flutter / React Native)
+This project demonstrates:
+
+* backend architecture design
+* API development
+* database modeling
+* integration with external services (Telegram)
+* building scalable applications
 
 ---
 
-## 👨‍💻 Author
+## 📌 Status
 
-Backend project for learning and practicing Python + FastAPI development.
+✅ Core functionality implemented
+🚧 Ready for deployment and further expansion
 
 ---
